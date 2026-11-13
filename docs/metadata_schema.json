@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LendLensSourceMetadata",
+  "type": "object",
+  "required": [
+    "doc_id",
+    "publisher",
+    "title",
+    "source_url",
+    "retrieved_at",
+    "sha256",
+    "document_type",
+    "status"
+  ],
+  "properties": {
+    "doc_id": {
+      "type": "string"
+    },
+    "publisher": {
+      "type": "string"
+    },
+    "entity": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "title": {
+      "type": "string"
+    },
+    "source_url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "retrieved_at": {
+      "type": "string"
+    },
+    "sha256": {
+      "type": "string"
+    },
+    "document_type": {
+      "type": "string"
+    },
+    "policy_domain": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "fiscal_year": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "issued_date": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "effective_from": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "effective_to": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "current",
+        "historical",
+        "superseded",
+        "unknown"
+      ]
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "superseded_by": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "authority_level": {
+      "enum": [
+        "regulator",
+        "company_policy",
+        "company_public_disclosure",
+        "reference"
+      ]
+    },
+    "page_number": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "section": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "company": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "nbfc_layer": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "product": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

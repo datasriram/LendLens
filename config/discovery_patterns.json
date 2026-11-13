@@ -1,0 +1,26 @@
+{
+  "current_nbfc_master_directions": [
+    "Non-Banking Financial Companies.*Responsible Business Conduct.*2025",
+    "Non-Banking Financial Companies.*Governance.*2025",
+    "Non-Banking Financial Companies.*Prudential Norms on Capital Adequacy.*2025",
+    "Non-Banking Financial Companies.*Registration, Exemptions and Framework for Scale Based Regulation.*2025",
+    "Non-Banking Financial Companies.*Miscellaneous.*2025",
+    "Non-Banking Financial Companies.*Microfinance Institution.*2025",
+    "Non-Banking Financial Companies.*Peer to Peer Lending Platform.*2025",
+    "Non-Banking Financial Companies.*Account Aggregator.*2025",
+    "Core Investment Companies.*2025",
+    "Mortgage Guarantee Companies.*2025"
+  ],
+  "lending_conduct_topics": [
+    "Digital Lending",
+    "Pre-payment Charges",
+    "Co-Lending",
+    "Gold and Silver Collateral",
+    "Key Facts Statement",
+    "Penal Charges",
+    "Recovery Agents",
+    "Compromise Settlements",
+    "Floating Interest Rate",
+    "KYC"
+  ]
+}
