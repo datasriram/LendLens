@@ -1,15 +1,14 @@
 from __future__ import annotations
 
+import os
+from urllib.parse import urlsplit
+
 import requests
 import streamlit as st
 
-
-import os
-
-API_URL = os.getenv(
-    "LENDLENS_API_URL",
-    "http://127.0.0.1:8000"
-).rstrip("/")
+API_URL = (os.getenv("LENDLENS_API_URL") or "http://127.0.0.1:8000").rstrip("/")
+DEMO_TOKEN = os.getenv("LENDLENS_DEMO_TOKEN", "")
+PUBLIC_DEMO = os.getenv("LENDLENS_PUBLIC_DEMO") == "1" or bool(DEMO_TOKEN)
 
 
 st.set_page_config(
@@ -18,6 +17,12 @@ st.set_page_config(
     layout="wide",
 )
 
+
+if PUBLIC_DEMO:
+    endpoint = urlsplit(API_URL)
+    if endpoint.scheme != "https" or not endpoint.hostname or endpoint.username or not DEMO_TOKEN:
+        st.error("The demo backend is not configured.")
+        st.stop()
 
 st.title("LendLens")
 
@@ -56,9 +61,13 @@ def ask_api(question: str):
         json={
             "question": question
         },
+        headers={"Authorization": f"Bearer {DEMO_TOKEN}"} if PUBLIC_DEMO else {},
         timeout=180,
+        allow_redirects=False,
     )
 
+    if response.is_redirect:
+        raise requests.HTTPError("Unexpected backend redirect", response=response)
     response.raise_for_status()
 
     return response.json()
@@ -98,16 +107,9 @@ def display_result(
         f"{data.get('latency_seconds', '?')} seconds"
     )
 
-    routing = (
-        data.get("routing")
-        or {}
-    )
-
-    with st.expander(
-        "Retrieval routing"
-    ):
-
-        st.json(routing)
+    if not PUBLIC_DEMO:
+        with st.expander("Retrieval routing"):
+            st.json(data.get("routing") or {})
 
     sources = (
         data.get("sources")
@@ -203,6 +205,10 @@ if submitted:
             "Enter at least one question."
         )
 
+    elif PUBLIC_DEMO and (len(questions) > 1 or len(questions[0]) > 1000):
+
+        st.warning("Enter one question of at most 1,000 characters.")
+
     else:
 
         st.markdown(
@@ -233,10 +239,13 @@ if submitted:
                 )
 
             except requests.RequestException as exc:
-
-                st.error(
-                    f"Question {index} failed: {exc}"
-                )
+                if PUBLIC_DEMO:
+                    if exc.response is not None and exc.response.status_code == 429:
+                        st.warning("The demo is busy. Please try again shortly.")
+                    else:
+                        st.error("The demo could not process your question. Please try again later.")
+                else:
+                    st.error(f"Question {index} failed: {exc}")
 
             progress.progress(
                 index / len(questions)

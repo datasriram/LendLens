@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: lendlens-api
+    runtime: docker
+    plan: 1c-2g
+    numInstances: 1
+    autoDeployTrigger: "off"
+    healthCheckPath: /health
+    envVars:
+      - key: LENDLENS_PUBLIC_DEMO
+        value: "1"
+      - key: LENDLENS_GENERATION_PROVIDER
+        value: groq
+      - key: GROQ_API_KEY
+        sync: false
+      - key: LENDLENS_QDRANT_URL
+        sync: false
+      - key: LENDLENS_QDRANT_API_KEY
+        sync: false
+      - key: LENDLENS_DEMO_TOKEN
+        sync: false
