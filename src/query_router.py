@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Any
@@ -60,7 +60,15 @@ CATEGORY_RULES = [
     (
         [
             "stressed asset",
+            "stressed borrower",
+            "stressed loan",
+            "stressed account",
             "resolution of stressed",
+            "resolution framework",
+            "special mention account",
+            "sma-0",
+            "sma-1",
+            "sma-2",
         ],
         "stressed_assets",
     ),
@@ -105,6 +113,27 @@ def detect_category(
 ) -> str | None:
 
     q = f" {query.lower()} "
+
+    # Recognize common variations in stressed-account terminology.
+    # These rules identify scope; they do not supply answer facts.
+    stress_terms = (
+        "stress",
+        "stressed",
+        "resolution",
+    )
+    account_terms = (
+        "borrower",
+        "loan",
+        "account",
+        "asset",
+        "overdue",
+    )
+
+    if (
+        any(term in q for term in stress_terms)
+        and any(term in q for term in account_terms)
+    ):
+        return "stressed_assets"
 
     for phrases, category in CATEGORY_RULES:
 

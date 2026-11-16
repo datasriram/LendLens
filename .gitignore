@@ -37,3 +37,48 @@ README_original_backup.md
 README_PATCH.md
 src/generation_providers_before_groq.py
 *.bak
+# ------------------------------
+# LendLens local environment
+# ------------------------------
+venv/
+.mypy_cache/
+.ruff_cache/
+# Environment variables and secrets
+credentials.json
+secrets.json
+# Local backups and drafts
+.local_backups/
+README_FINAL_DRAFT.md
+# Local vector database and model caches
+qdrant_storage/
+storage/
+.cache/
+models_cache/
+# Local datasets / document collections
+data/
+raw_data/
+corpus/
+knowledge_base/
+documents/
+downloads/
+# Generated evaluation artifacts
+reports/*.json
+reports/*.jsonl
+reports/*.xlsx
+reports/*.csv
+# Local benchmark workbooks
+*.xlsx
+*.xls
+# Logs, temporary outputs
+logs/
+tmp/
+temp/
+*.tmp
+# Operating system and editor
+.vscode/
+.idea/
+
+# Experimental and temporary project files
+scripts/experiment_multiquery.py
+*.before_gold40
+*.before_query_reformulation

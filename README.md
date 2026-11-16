@@ -1,130 +1,256 @@
-﻿# LendLens
-### Financial Regulatory Intelligence Using Hybrid RAG
+# LendLens
 
-LendLens is an evidence-grounded Retrieval-Augmented Generation (RAG) application designed to answer questions about Indian RBI regulations and publicly available NBFC policies.
+**Evidence-grounded regulatory intelligence for India's NBFC ecosystem.**
 
-It combines hybrid retrieval, metadata-aware routing, cross-encoder reranking, context expansion, and LLM generation to produce source-supported regulatory answers.
+LendLens is a Retrieval-Augmented Generation (RAG) application designed to answer questions about Reserve Bank of India (RBI) regulations, NBFC compliance requirements, and publicly available financial-company policies.
 
-## Key Features
+Instead of relying solely on model knowledge, the system retrieves regulatory evidence, reranks relevant passages, generates grounded answers, and attaches source references. It also supports abstention and safety guardrails when a question is unsupported or outside its permitted scope.
 
-- Hybrid retrieval combining dense embeddings and BM25 sparse search
-- Reciprocal Rank Fusion (RRF) using Qdrant
-- Cross-encoder reranking for improved evidence selection
-- Metadata-aware routing across RBI regulations and NBFC policies
-- Authority-aware and temporal source handling
-- Context expansion for retrieving surrounding evidence
-- Grounded answer generation with source citations
-- Abstention mechanisms for insufficient evidence
-- Guardrails for restricted lending decisions
-- FastAPI backend and Streamlit frontend
-- Support for local Ollama and hosted Groq models
+> **Project status:** Functional research prototype with a completed 40-question validation run. Not intended to replace professional legal or regulatory advice.
+
+## Problem
+
+Indian NBFC regulatory information is distributed across RBI directions, circulars, and company-specific policy disclosures.
+
+Users often need to:
+
+- Find the applicable RBI requirements.
+- Understand obligations and limitations.
+- Identify authoritative source documents.
+- Compare company disclosures with regulatory requirements.
+- Distinguish current information from historical material.
+
+Standard document search can retrieve relevant text without synthesizing it. General-purpose language models may produce plausible but unsupported answers.
+
+LendLens combines document retrieval with evidence-constrained generation to address these challenges.
 
 ## Architecture
 
-1. User submits a regulatory question through Streamlit.
-2. FastAPI receives and validates the request.
-3. Query guardrails check for restricted requests.
-4. Metadata-aware routing identifies relevant source categories.
-5. Dense and sparse retrieval search the Qdrant knowledge base.
-6. Reciprocal Rank Fusion combines retrieval results.
-7. Cross-encoder reranking improves evidence ranking.
-8. Context expansion retrieves additional supporting information.
-9. The language model generates an evidence-grounded answer.
-10. Citation validation and abstention logic process the response.
+```text
+                     User Question
+                           |
+                           v
+                  FastAPI / Streamlit
+                           |
+                           v
+                  Safety Guardrails
+                           |
+                           v
+                   Query Routing
+             (authority / topic / time)
+                           |
+                           v
+                  Hybrid Retrieval
+                  /              \
+            Dense Search      Sparse BM25
+                  \              /
+                   Reciprocal Rank
+                       Fusion
+                           |
+                           v
+                   Cross-Encoder
+                      Reranking
+                           |
+                           v
+                  Context Expansion
+                           |
+                           v
+                  Grounded Generation
+                    (Groq / Ollama)
+                           |
+                           v
+               Answer + Source References
+```
 
 ## Technology Stack
 
 | Component | Technology |
 |---|---|
-| Programming | Python |
-| Frontend | Streamlit |
-| Backend | FastAPI |
-| Vector Database | Qdrant |
-| Dense Embeddings | BAAI/bge-small-en-v1.5 |
-| Sparse Retrieval | BM25 |
-| Fusion | Reciprocal Rank Fusion |
-| Reranking | Cross-Encoder |
-| Generation | Qwen via Ollama or Groq |
-| Evaluation | Pytest and custom benchmark scripts |
+| Programming language | Python |
+| API framework | FastAPI |
+| User interface | Streamlit |
+| Vector database | Qdrant (local or cloud) |
+| Dense embeddings | BAAI/bge-small-en-v1.5 |
+| Sparse retrieval | Qdrant/bm25 |
+| Fusion | Reciprocal Rank Fusion (RRF) |
+| Reranking | Xenova/ms-marco-MiniLM-L-6-v2 |
+| Generation | Groq-hosted Qwen or local Ollama |
+| Evaluation | Verified regulatory benchmark, API tests |
 
-## Project Structure
+## Knowledge Base
 
-- src/ : Core RAG implementation
-- api/ : FastAPI backend
-- scripts/ : Corpus preparation and evaluation tools
-- config/ : Application configuration
-- data/ : Corpus manifests and metadata reports
-- docs/ : Research and technical documentation
-- tests/ : Integration tests
-- streamlit_app.py : Interactive frontend
-- requirements.txt : Python dependencies
+The indexed knowledge base contains approximately **15,095 document chunks**.
 
-The original source-document corpus and local vector databases are excluded from the public repository.
+It covers:
 
-## Local Setup
+- RBI directions applicable to NBFCs.
+- KYC and customer due diligence.
+- Digital lending and lending service providers.
+- Outsourcing risk management.
+- Fraud risk management.
+- Cybersecurity and business continuity.
+- Stressed assets and asset classification.
+- Internal Ombudsman and grievance redressal.
+- Selected NBFC public policies and disclosures.
 
-Requires Python 3.12 and an indexed LendLens knowledge base.
+Document metadata includes publisher, regulatory authority, topic category, and temporal status where available.
 
-1. Clone the repository.
-2. Create a Python virtual environment.
-3. Install dependencies using requirements.txt.
-4. Prepare and index the RBI/NBFC corpus using the provided scripts.
-5. Configure the generation provider and required credentials.
-6. Start the FastAPI backend with start_api.ps1.
-7. Start the Streamlit frontend with start_ui.ps1.
+## How Retrieval Works
 
-The default configuration uses local Qdrant and Ollama with Qwen3 4B.
+### 1. Metadata-Aware Query Routing
 
-## Cloud Deployment
+Rule-based routing identifies regulatory topics and can apply relevant metadata filters to search for suitable documents.
 
-LendLens supports configurable hosted generation and vector storage.
+### 2. Hybrid Search
 
-Environment variables:
+The system combines dense semantic embeddings and sparse BM25 retrieval through Qdrant.
 
-- GROQ_API_KEY
-- LENDLENS_GENERATION_PROVIDER
-- LENDLENS_QDRANT_URL
-- LENDLENS_QDRANT_API_KEY
-- LENDLENS_API_URL
+Reciprocal Rank Fusion merges both retrieval branches.
 
-Set actual credentials through deployment secrets, never in source code.
+### 3. Reranking
 
-Cloud deployment and remote collection migration are pending verification.
+A cross-encoder reranks the candidate passages for relevance to the original question.
 
-## Evaluation Methodology
+### 4. Context Expansion
 
-A 180-question evaluation benchmark was prepared across regulatory lookup, company policy, cross-document reasoning, temporal validity, authority handling, abstention, and adversarial safety.
+Adjacent passages may be included when relevant to improve the evidence available for generation.
 
-The evaluation design separates:
+### 5. Grounded Generation
 
-- 40 gold-standard validation questions
-- 140 held-out final evaluation questions
+The generation layer produces an answer using retrieved evidence and provides source references.
 
-Evaluation dimensions include Recall@K, MRR, answer correctness, faithfulness, citation accuracy, authority correctness, temporal correctness, and abstention performance.
+The system can abstain when evidence is insufficient. Guardrails restrict unsupported individual lending decisions and other out-of-scope actions.
 
-### Current Results
+## Evaluation
 
-The Groq/Qwen behavioral benchmark has completed 12 successful cases, with zero observed failures among completed cases.
+LendLens was evaluated using a verified benchmark containing **180 questions**, divided into:
 
-Eight additional cases remain incomplete due to provider rate limits.
+- **40 validation questions** for development-stage assessment.
+- **140 held-out questions** reserved for future final testing.
 
-Full factual evaluation and final held-out testing remain pending.
+### Gold-40 Validation Run
 
-These preliminary results do not establish production reliability or overall factual accuracy.
+| Metric | Result |
+|---|---:|
+| Completed requests | 40 / 40 |
+| API request errors | 0 |
+| Abstentions | 16 |
+| Median API latency | 18.95 seconds |
+| P95 API latency | 23.75 seconds |
+| Citation-reference mismatches | 1 |
 
-## Live Demo
+These metrics describe execution, latency, and response behavior. They do **not** establish that every generated answer was factually correct.
 
-Deployment pending.
+A separate provisional factual review identified both successful responses and incomplete or unsuccessful ones. Independent human verification remains necessary.
 
-## Planned Improvements
+See [Gold-40 Evaluation](docs/GOLD40_EVALUATION.md) for methodology, findings, and limitations.
 
-- Complete gold-standard evaluation
-- Complete held-out benchmark testing
-- Verify cloud deployment
-- Improve latency and retrieval quality
-- Strengthen safety and adversarial robustness
-- Extend agent-based financial workflows
+### Behavioral Testing
 
-## Disclaimer
+An earlier 20-case behavioral run passed 20 of 20 automated checks. These checks are distinct from factual accuracy.
 
-LendLens is an educational and research project. It is not a substitute for official RBI guidance, legal advice, or professional financial advice.
+## Known Limitations
+
+- Broad questions may receive incomplete answers even when relevant evidence is retrieved.
+- Cross-document regulatory and company-policy comparisons can result in abstentions.
+- Citation identifiers alone do not prove that the underlying passages support every claim.
+- Some company disclosures have incomplete temporal metadata.
+- Guardrail rules can produce false positives.
+- The 140 held-out questions have not yet been reported as a completed final evaluation.
+- Performance depends on the selected generation provider and deployment environment.
+
+These limitations are documented rather than hidden.
+
+## Running Locally
+
+### 1. Set Up Python
+
+From the repository root on Windows:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+### 2. Configure Generation
+
+For Groq:
+
+```powershell
+$env:LENDLENS_GENERATION_PROVIDER = "groq"
+$secureKey = Read-Host "Groq API key" -AsSecureString
+$env:GROQ_API_KEY = [System.Net.NetworkCredential]::new("", $secureKey).Password
+```
+
+Alternatively, select the locally configured Ollama provider:
+
+```powershell
+$env:LENDLENS_GENERATION_PROVIDER = "ollama"
+```
+
+Ensure the selected Ollama model is available before starting the application.
+
+### 3. Configure Qdrant
+
+The application supports local Qdrant storage and a configured Qdrant Cloud instance.
+
+For Qdrant Cloud, provide the relevant connection environment variables:
+
+```powershell
+$env:LENDLENS_QDRANT_URL = Read-Host "Qdrant URL"
+$secureKey = Read-Host "Qdrant API key" -AsSecureString
+$env:LENDLENS_QDRANT_API_KEY = [System.Net.NetworkCredential]::new("", $secureKey).Password
+```
+
+The database must already contain the required LendLens collection. Installing dependencies alone does not populate the knowledge base.
+
+Avoid opening the same local Qdrant storage directory from multiple independent Python processes simultaneously.
+
+### 4. Start the API
+
+```powershell
+python -m uvicorn api.main:app --host 127.0.0.1 --port 8000
+```
+
+### 5. Launch Streamlit
+
+Open a separate terminal:
+
+```powershell
+streamlit run streamlit_app.py
+```
+
+### 6. Inspect API Health
+
+Visit:
+
+`http://127.0.0.1:8000/health`
+
+## Repository Components
+
+- `src/retrieval.py` ? hybrid retrieval, reranking and context expansion.
+- `src/query_router.py` ? metadata-aware query routing.
+- `src/generation.py` ? grounded-answer generation logic.
+- `src/generation_providers.py` ? model-provider integration.
+- `src/service.py` ? end-to-end question-answering orchestration.
+- `api/main.py` ? FastAPI endpoints.
+- `streamlit_app.py` ? user interface.
+- `scripts/run_gold40.py` ? validation-run utility.
+- `docs/GOLD40_EVALUATION.md` ? evaluation documentation.
+
+## Responsible Use
+
+LendLens is a research and educational system.
+
+It should not be used as the sole authority for lending decisions, legal advice, compliance sign-off, or the interpretation of time-sensitive regulations.
+
+Users should verify material requirements against current RBI publications and applicable company disclosures.
+
+## Project Demonstration
+
+A recorded product demonstration and screenshots can be added here.
+
+## Development Status
+
+**LendLens v1.0 ? evaluation completed; documentation and demonstration in progress.**
