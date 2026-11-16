@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import json
@@ -14,10 +14,7 @@ import xml.etree.ElementTree as ET
 import requests
 
 ROOT = Path(__file__).resolve().parents[1]
-WORKBOOK = Path(
-    r"C:\Users\tumma\Downloads"
-    r"\LendLens_Evaluation_Benchmark_v3_Gold40_Verified.xlsx"
-)
+WORKBOOK = ROOT / "evaluation" / "gold40" / "LendLens_Evaluation_Benchmark_v3_Gold40_Verified.xlsx"
 OUTPUT = ROOT / "reports" / "gold40_raw_results.json"
 
 API_BASE = os.getenv(

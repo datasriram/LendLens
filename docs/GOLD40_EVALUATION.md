@@ -8,8 +8,8 @@ Generated: 2026-11-16 09:17 UTC
 - Dataset role: validation, not held-out final test.
 - Generation provider: Groq (as configured during the run).
 - Retrieval: hybrid dense/sparse search with reranking and metadata routing.
-- Raw results: `reports/gold40_raw_results.json`.
-- Gold benchmark: `LendLens_Evaluation_Benchmark_v3_Gold40_Verified.xlsx` (maintained separately).
+- Raw results: [frozen response JSON](../evaluation/gold40/gold40_raw_results.json) (local).
+- Gold benchmark: [LendLens_Evaluation_Benchmark_v3_Gold40_Verified.xlsx](../evaluation/gold40/LendLens_Evaluation_Benchmark_v3_Gold40_Verified.xlsx) (local). See the `Gold_40` and `Gold_Rubric` tabs.
 
 ## Execution metrics
 
@@ -68,3 +68,13 @@ The separate Gold-40 evaluation workbook contains the provisional question-level
 The Gold-40 responses are retained as a frozen validation snapshot.
 The remaining 140 benchmark questions are reserved for held-out evaluation.
 No gold-answer content was added to the retrieval system during this reporting step.
+
+The verified workbook contains the `Benchmark_180` master list and the
+`Evaluation_Split` tab. The original v1 master is preserved at
+[`evaluation/LendLens_Evaluation_Benchmark_v1.xlsx`](../evaluation/LendLens_Evaluation_Benchmark_v1.xlsx).
+The [held-out CSV](../evaluation/heldout140/heldout140_questions.csv) preserves the 140 rows from
+`Evaluation_Split`. The two sets have disjoint question IDs and together cover all
+180 master IDs. The evaluation files are local and Git-ignored.
+
+Running `scripts/run_gold40.py` writes working results into `reports/`. The frozen
+Gold-40 JSON lives under `evaluation/gold40/`.

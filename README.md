@@ -128,6 +128,16 @@ LendLens was evaluated using a verified benchmark containing **180 questions**, 
 - **40 validation questions** for development-stage assessment.
 - **140 held-out questions** reserved for future final testing.
 
+The local `evaluation/gold40/` folder holds the verified workbook and all 40
+frozen API responses. The workbook includes the Gold rubric and the split
+definition. The local `evaluation/heldout140/` folder holds the 140 reserved
+questions. The original 180-question v1 workbook is preserved under
+`evaluation/`. Evaluation data stays local.
+
+`reports/` is for working run outputs and `_archive_local/` holds earlier
+experiments and backups. See the [Gold-40 evaluation notes](docs/GOLD40_EVALUATION.md)
+for exact filenames and the status of factual review.
+
 ### Gold-40 Validation Run
 
 | Metric | Result |

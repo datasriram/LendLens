@@ -82,3 +82,7 @@ temp/
 scripts/experiment_multiquery.py
 *.before_gold40
 *.before_query_reformulation
+
+# Local archives and evaluation data
+/_archive_local/
+/evaluation/
